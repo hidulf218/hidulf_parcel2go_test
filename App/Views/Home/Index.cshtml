@@ -1,0 +1,72 @@
+﻿@model App.Models.GetQuoteViewModel;
+@{
+    ViewData["Title"] = "Get Quote";
+    ViewData["ColServiceNameCode"] = App.Controllers.HomeController.COLSERVICENAMECODE;
+    ViewData["ColServiceNameLabel"] = "Service Name";
+    ViewData["ColTotalPriceCode"] = App.Controllers.HomeController.COLTOTALPRICECODE;
+    ViewData["ColTotalPriceLabel"] = "Total Price";
+}
+
+<div>
+    <h1 class="display-4">Get Quote</h1>
+    @using (Html.BeginForm("GetQuote", "Home", FormMethod.Post, new { @class = "form" }))
+    {
+        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+        @if (Model.ErrorMessage != null)
+        {
+            <div class="text-danger">@Model.ErrorMessage</div>
+        }
+        @Html.AntiForgeryToken()
+
+        <div class="form-group">
+            @Html.LabelFor(m => m.InputWeight)
+            @Html.EditorFor(m => m.InputWeight, new { htmlAttributes = new { @class = "form-control", placeholder = "Weight" } })
+        </div>
+
+        @Html.HiddenFor(m => m.InputWidth)
+        @Html.HiddenFor(m => m.InputHeght)
+        @Html.HiddenFor(m => m.InputLength)
+        @Html.HiddenFor(m => m.InputCollectionCountry)
+        @Html.HiddenFor(m => m.InputDeliveryCountry)
+        @Html.HiddenFor(m => m.InputCollectionType)
+        @Html.HiddenFor(m => m.InputDeliveryType)
+
+        <button type="submit" class="btn btn-primary">Quote</button>
+    }
+
+    @if (Model.Quotes != null && Model.Quotes.Length > 0)
+    {
+        <hr />
+        <table class="table table-striped">
+            <tr>
+                <th scope="col">
+                    @if (Model.SortCol == (string)ViewData["ColServiceNameCode"])
+                    {
+                        @Html.Label((string)ViewData["ColServiceNameLabel"]);
+                    }
+                    else
+                    {
+                        @Html.ActionLink((string)ViewData["ColServiceNameLabel"], "SortQuotes", "Home", new { col = ViewData["ColServiceNameCode"] })
+                    }
+                </th>
+                <th scope="col" class="currency">
+                    @if (Model.SortCol == (string)ViewData["ColTotalPriceCode"])
+                    {
+                        @Html.Label((string)ViewData["ColTotalPriceLabel"]);
+                    }
+                    else
+                    {
+                        @Html.ActionLink((string)ViewData["ColTotalPriceLabel"], "SortQuotes", "Home", new { col = ViewData["ColTotalPriceCode"] })
+                    }
+                </th>
+            </tr>
+            @foreach (Core.Model.Result.Quote quote in Model.Quotes)
+            {
+                <tr>
+                    <td scope="row">@Html.DisplayFor(q => quote.Service.Name)</td>
+                    <td class="currency">@Html.DisplayFor(q => quote.TotalPrice)</td>
+                </tr>
+            }
+        </table>
+    }
+</div>
